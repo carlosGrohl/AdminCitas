@@ -1,0 +1,33 @@
+# Archivos con mis datos
+*.docx
+*.pdf
+*.tmp
+
+# Archivos compilados de Java
+*.class
+
+# Archivos de intercambio de editores
+*.swp
+*.swo
+*~
+
+# Archivos de proyecto IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+
+# Archivos de build
+target/
+build/
+dist/
+
+# Archivos de datos (opcional, descomentar si se desea ignorar)
+# data/*.csv
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
