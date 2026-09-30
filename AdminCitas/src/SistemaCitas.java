@@ -18,114 +18,92 @@ public class SistemaCitas {
         citaRepo = new CitaRepositorio("data/Citas.csv", doctorRepo, pacienteRepo);
     }
 
-    //Punto de entrada del sistema (se llama desde Main)
-    void iniciar(){
-        int opcion;
-        do {
-            opcion = mostrarMenuPrincipal();
-            switch (opcion){
-                case 1 -> {
-                    if (iniciarSesion()){
-                        int opcionAdmin;
-                        do {
-                            opcionAdmin = mostrarMenuAdministrador();
-                            switch (opcionAdmin){
-                                case 1 -> gestionarDoctores();
-                                case 2 -> gestionarPacientes();
-                                case 3 -> gestionarCitas();
-                                case 0 -> {
-                                    IO.println("Sesion cerrada.");
-                                    adminActual = null;
-                                }
-                                default -> IO.println("Opcion no valida.");
-                            }
-                        } while (opcionAdmin != 0);
-                    }
-                }
-                case 0 -> IO.println("Hasta luego.");
-                default -> IO.println("Opcion no valida.");
-            }
-        } while (opcion != 0);
-    }
-
-    //Menus
-    private int mostrarMenuPrincipal(){
-        IO.println("\n=== CLINICA - MENU PRINCIPAL ===");
+    //Menus (se llaman desde Main)
+    int mostrarMenuPrincipal(){
+        IO.println("\n*** MENU PRINCIPAL ***");
         IO.println("1. Iniciar sesion");
-        IO.println("0. Salir");
+        IO.println("2. Salir");
         return leerOpcion("Opcion: ");
     }
 
-    private int mostrarMenuAdministrador(){
-        IO.println("\n=== MENU ADMINISTRADOR (" + adminActual.getUsuario() + ") ===");
-        IO.println("1. Gestionar doctores");
-        IO.println("2. Gestionar pacientes");
-        IO.println("3. Gestionar citas");
-        IO.println("0. Cerrar sesion");
+    int mostrarMenuAdministrador(){
+        IO.println("\n*** MENU (" + adminActual.getUsuario() + ") ***");
+        IO.println("1. Gestionar Doctores");
+        IO.println("2. Gestionar Pacientes");
+        IO.println("3. Gestionar Citas");
+        IO.println("4. Cerrar Sesion");
         return leerOpcion("Opcion: ");
     }
 
-    private boolean iniciarSesion(){
-        String Usuario = IO.readln("Usuario: ");
-        String Password = IO.readln("Password: ");
+    //Pantalla de Login
+    boolean iniciarSesion(){
+        IO.println("\n--- Login ---");
+        String Usuario = IO.readln("Usuario: ").trim();
+        String Password = IO.readln("Contrasena: ").trim();
         if (Administrador.Validar(Usuario, Password)){
             adminActual = new Administrador(Usuario, Password);
             IO.println("Bienvenido, " + Usuario + ".");
             return true;
         }
-        IO.println("Usuario o password incorrectos.");
+        IO.println("Usuario o contrasena incorrectos.");
         return false;
     }
 
-    private void gestionarDoctores(){
+    //Regresa true si el administrador confirma que quiere cerrar sesion
+    boolean cerrarSesion(){
+        String respuesta = IO.readln("Cerrar sesion? (S/N): ").trim();
+        if (respuesta.equalsIgnoreCase("S")){
+            IO.println("Sesion cerrada.");
+            adminActual = null;
+            return true;
+        }
+        return false;
+    }
+
+    //Submenus
+    void gestionarDoctores(){
         int opcion;
         do {
-            IO.println("\n--- Doctores ---");
-            IO.println("1. Alta de doctor");
-            IO.println("2. Mostrar doctores");
-            IO.println("0. Regresar");
-            opcion = leerOpcion("Opcion: ");
+            opcion = mostrarSubmenu("Doctores");
             switch (opcion){
                 case 1 -> altaDoctor();
-                case 2 -> MostrarDoctores();
-                case 0 -> {}
+                case 2 -> buscarDoctor();
+                case 3 -> MostrarDoctores();
+                case 4 -> eliminarDoctor();
+                case 5 -> {}
                 default -> IO.println("Opcion no valida.");
             }
-        } while (opcion != 0);
+        } while (opcion != 5);
     }
 
-    private void gestionarPacientes(){
+    void gestionarPacientes(){
         int opcion;
         do {
-            IO.println("\n--- Pacientes ---");
-            IO.println("1. Alta de paciente");
-            IO.println("2. Mostrar pacientes");
-            IO.println("0. Regresar");
-            opcion = leerOpcion("Opcion: ");
+            opcion = mostrarSubmenu("Pacientes");
             switch (opcion){
                 case 1 -> altaPaciente();
-                case 2 -> MostrarPacientes();
-                case 0 -> {}
+                case 2 -> buscarPaciente();
+                case 3 -> MostrarPacientes();
+                case 4 -> eliminarPaciente();
+                case 5 -> {}
                 default -> IO.println("Opcion no valida.");
             }
-        } while (opcion != 0);
+        } while (opcion != 5);
     }
 
-    private void gestionarCitas(){
+    void gestionarCitas(){
         int opcion;
         do {
-            IO.println("\n--- Citas ---");
-            IO.println("1. Alta de cita");
-            IO.println("2. Mostrar citas");
-            IO.println("0. Regresar");
-            opcion = leerOpcion("Opcion: ");
+            opcion = mostrarSubmenu("Citas");
             switch (opcion){
                 case 1 -> altaCita();
-                case 2 -> MostrarCitas();
-                case 0 -> {}
+                case 2 -> buscarCita();
+                case 3 -> MostrarCitas();
+                case 4 -> eliminarCita();
+                case 5 -> {}
                 default -> IO.println("Opcion no valida.");
             }
-        } while (opcion != 0);
+        } while (opcion != 5);
     }
 
     //Doctores
@@ -143,6 +121,15 @@ public class SistemaCitas {
         }
     }
 
+    private void buscarDoctor(){
+        Doctor doctor = doctorRepo.buscarPorId(IO.readln("Id del doctor: ").trim());
+        if (doctor == null){
+            IO.println("No existe ese doctor.");
+            return;
+        }
+        IO.println(doctor);
+    }
+
     private void MostrarDoctores(){
         List<Doctor> doctores = doctorRepo.listarTodos();
         if (doctores.isEmpty()){
@@ -150,6 +137,19 @@ public class SistemaCitas {
             return;
         }
         for (Doctor d : doctores) IO.println(d);
+    }
+
+    private void eliminarDoctor(){
+        String Id = IO.readln("Id del doctor: ").trim();
+        if (!citaRepo.buscarPorDoctor(Id).isEmpty()){
+            IO.println("No se puede eliminar: el doctor tiene citas registradas.");
+            return;
+        }
+        if (doctorRepo.eliminar(Id)){
+            IO.println("Doctor eliminado.");
+        } else {
+            IO.println("No existe ese doctor.");
+        }
     }
 
     //Pacientes
@@ -166,6 +166,15 @@ public class SistemaCitas {
         }
     }
 
+    private void buscarPaciente(){
+        Paciente paciente = pacienteRepo.buscarPorId(IO.readln("Id del paciente: ").trim());
+        if (paciente == null){
+            IO.println("No existe ese paciente.");
+            return;
+        }
+        IO.println(paciente);
+    }
+
     private void MostrarPacientes(){
         List<Paciente> pacientes = pacienteRepo.listarTodos();
         if (pacientes.isEmpty()){
@@ -173,6 +182,19 @@ public class SistemaCitas {
             return;
         }
         for (Paciente p : pacientes) IO.println(p);
+    }
+
+    private void eliminarPaciente(){
+        String Id = IO.readln("Id del paciente: ").trim();
+        if (!citaRepo.buscarPorPaciente(Id).isEmpty()){
+            IO.println("No se puede eliminar: el paciente tiene citas registradas.");
+            return;
+        }
+        if (pacienteRepo.eliminar(Id)){
+            IO.println("Paciente eliminado.");
+        } else {
+            IO.println("No existe ese paciente.");
+        }
     }
 
     //Citas
@@ -220,6 +242,16 @@ public class SistemaCitas {
         }
     }
 
+    private void buscarCita(){
+        Cita cita = citaRepo.buscarPorId(IO.readln("Id de la cita: ").trim());
+        if (cita == null){
+            IO.println("No existe esa cita.");
+            return;
+        }
+        IO.println(cita);
+        IO.println("Motivo: " + cita.getMotivo());
+    }
+
     private void MostrarCitas(){
         List<Cita> citas = citaRepo.listarTodos();
         if (citas.isEmpty()){
@@ -227,6 +259,25 @@ public class SistemaCitas {
             return;
         }
         for (Cita c : citas) IO.println(c);
+    }
+
+    private void eliminarCita(){
+        if (citaRepo.eliminar(IO.readln("Id de la cita: ").trim())){
+            IO.println("Cita eliminada.");
+        } else {
+            IO.println("No existe esa cita.");
+        }
+    }
+
+    //Metodos de apoyo
+    private int mostrarSubmenu(String titulo){
+        IO.println("\n--- " + titulo + " ---");
+        IO.println("1. Alta");
+        IO.println("2. Buscar");
+        IO.println("3. Mostrar");
+        IO.println("4. Eliminar");
+        IO.println("5. Regresar");
+        return leerOpcion("Opcion: ");
     }
 
     //Lee un numero del teclado; si no es numero regresa -1
