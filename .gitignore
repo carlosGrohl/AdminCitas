@@ -22,8 +22,8 @@ target/
 build/
 dist/
 
-# Archivos de datos (opcional, descomentar si se desea ignorar)
-# data/*.csv
+# Archivos de datos
+AdminCitas/data/*
 
 # Logs
 *.log
