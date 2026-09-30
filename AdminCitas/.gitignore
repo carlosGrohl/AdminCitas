@@ -4,6 +4,9 @@ out/
 !**/src/test/**/out/
 .kotlin
 
+###Carpeta con los CSV
+AdminCitas/data/*
+
 ### Eclipse ###
 .apt_generated
 .classpath
